@@ -41,8 +41,8 @@ class Cube(Application):
         self.scheme.configure(h0=self.hdx*self.dx, hdx=self.hdx)
         kernel = CubicSpline(dim=3)
         dt = 1e-4
-        tf = 5e-4
-        self.scheme.configure_solver(kernel=kernel, tf=tf, dt=dt)
+        tf = 50e-4
+        self.scheme.configure_solver(kernel=kernel, tf=tf, dt=dt, output_at_times=numpy.arange(0.0, tf-0.1e-4, 1.0e-4))
 
     def create_scheme(self):
         co = 10.0

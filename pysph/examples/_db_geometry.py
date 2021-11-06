@@ -249,11 +249,31 @@ class DamBreak2DGeometry(object):
 
 class DamBreak3DGeometry(object):
     def __init__(
-            self, container_height=1.0, container_width=1.0, container_length=3.22,
-            fluid_column_height=0.55, fluid_column_width=1.0, fluid_column_length=1.228,
-            obstacle_center_x=2.5, obstacle_center_y=0,
-            obstacle_length=0.16, obstacle_height=0.161, obstacle_width=0.4,
-            nboundary_layers=5, with_obstacle=True, dx=0.02, hdx=1.2, rho0=1000.0):
+        self,
+        container_height=1.0,
+        container_width=1.0,
+        container_length=3.22,
+        fluid_column_height=0.55,
+        fluid_column_width=1.0,
+        fluid_column_length=1.228,
+        fluid_droplet_center_x=0.0,
+        fluid_droplet_center_y=0.0,
+        fluid_droplet_center_z=0.0,
+        fluid_droplet_radius=0.0,
+        fluid_droplet_initial_velocity_x=0.0,
+        fluid_droplet_initial_velocity_y=0.0,
+        fluid_droplet_initial_velocity_z=0.0,
+        obstacle_center_x=2.5,
+        obstacle_center_y=0,
+        obstacle_length=0.16,
+        obstacle_height=0.161,
+        obstacle_width=0.4,
+        nboundary_layers=5,
+        with_obstacle=True,
+        dx=0.02,
+        hdx=1.2,
+        rho0=1000.0,
+    ):
 
         # save the geometry details
         self.container_width = container_width
@@ -263,6 +283,14 @@ class DamBreak3DGeometry(object):
         self.fluid_column_length = fluid_column_length
         self.fluid_column_width = fluid_column_width
         self.fluid_column_height = fluid_column_height
+
+        self.fluid_droplet_center_x = fluid_droplet_center_x
+        self.fluid_droplet_center_y = fluid_droplet_center_y
+        self.fluid_droplet_center_z = fluid_droplet_center_z
+        self.fluid_droplet_radius = fluid_droplet_radius
+        self.fluid_droplet_initial_velocity_x= fluid_droplet_initial_velocity_x,
+        self.fluid_droplet_initial_velocity_y= fluid_droplet_initial_velocity_y,
+        self.fluid_droplet_initial_velocity_z= fluid_droplet_initial_velocity_z,
 
         self.obstacle_center_x = obstacle_center_x
         self.obstacle_center_y = obstacle_center_y
@@ -285,6 +313,15 @@ class DamBreak3DGeometry(object):
         fluid_column_height = self.fluid_column_height
         fluid_column_width = self.fluid_column_width
         fluid_column_length = self.fluid_column_length
+
+        fluid_droplet_center_x = self.fluid_droplet_center_x
+        fluid_droplet_center_y = self.fluid_droplet_center_y
+        fluid_droplet_center_z = self.fluid_droplet_center_z
+        fluid_droplet_radius = self.fluid_droplet_radius
+
+        fluid_droplet_initial_velocity_x = self.fluid_droplet_initial_velocity_x
+        fluid_droplet_initial_velocity_y = self.fluid_droplet_initial_velocity_y
+        fluid_droplet_initial_velocity_z = self.fluid_droplet_initial_velocity_z
 
         container_height = self.container_height
         container_length = self.container_length
@@ -319,8 +356,9 @@ class DamBreak3DGeometry(object):
         y = yy.ravel()
         z = zz.ravel()
 
-        # create a dummy particle array from which we'll sort
-        pa = get_particle_array_wcsph(name='block', x=x, y=y, z=z)
+        u = numpy.zeros(x.size)
+        v = numpy.zeros(y.size)
+        w = numpy.zeros(z.size)
 
         # get the individual arrays
         indices = []
@@ -345,12 +383,30 @@ class DamBreak3DGeometry(object):
 
                 findices.append(i)
 
+            # droplet
+            elif (
+                numpy.sqrt(
+                    (xi - fluid_droplet_center_x) ** 2
+                    + (yi - fluid_droplet_center_y) ** 2
+                    + (zi - fluid_droplet_center_z) ** 2
+                )
+                <= fluid_droplet_radius
+            ):
+
+                findices.append(i)
+                u[i] = fluid_droplet_initial_velocity_x[0]
+                v[i] = fluid_droplet_initial_velocity_y[0]
+                w[i] = fluid_droplet_initial_velocity_z[0]
+
             # obstacle
             if ((ocx - obl2 <= xi <= ocx + obl2) and
                 (ocy - obw2 <= yi <= ocy + obw2) and
                     (0 < zi <= obh)):
 
                 oindices.append(i)
+
+        # create a dummy particle array from which we'll sort
+        pa = get_particle_array_wcsph(name='block', x=x, y=y, z=z, u=u, v=v, w=w)
 
         # extract the individual arrays
         fa = LongArray(len(findices))
