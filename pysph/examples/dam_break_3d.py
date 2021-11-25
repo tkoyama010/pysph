@@ -22,7 +22,7 @@ from _db_geometry import DamBreak3DGeometry
 dim = 3
 
 dt = 1.2e-5
-tf = dt*200
+tf = dt*400
 
 # parameter to change the resolution
 dx = 0.0001
@@ -88,7 +88,7 @@ class DamBreak3D(Application):
         s.configure_solver(
             kernel=kernel, integrator_cls=EPECIntegrator, tf=tf, dt=dt,
             adaptive_timestep=True, n_damp=50,
-            output_at_times=np.arange(0.0, tf, dt*10)
+            output_at_times=np.arange(0.0, tf, dt*20)
         )
 
     def create_particles(self):
