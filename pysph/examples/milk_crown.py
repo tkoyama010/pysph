@@ -17,12 +17,12 @@ logging.basicConfig(level=logging.INFO)
 
 import sys
 sys.path.insert(0, ".")
-from _db_geometry import DamBreak3DGeometry
+from _db_geometry import MilkCrownGeometry
 
 dim = 3
 
 dt = 1.2e-5
-tf = dt*400
+tf = dt*800
 
 # parameter to change the resolution
 dx = 0.0001
@@ -36,7 +36,7 @@ beta = 0.0
 c0 = 10.0 * np.sqrt(2.0 * 9.81 * 0.55)
 
 
-class DamBreak3D(Application):
+class MilkCrown(Application):
     def add_user_options(self, group):
         group.add_argument(
             '--dx', action='store', type=float, dest='dx',  default=dx,
@@ -51,7 +51,7 @@ class DamBreak3D(Application):
         dx = self.options.dx
         self.dx = dx
         self.hdx = self.options.hdx
-        self.geom = DamBreak3DGeometry(
+        self.geom = MilkCrownGeometry(
             dx=dx, nboundary_layers=nboundary_layers, hdx=self.hdx, rho0=ro,
             with_obstacle=False,
             container_height=0.0240,
@@ -173,6 +173,6 @@ class DamBreak3D(Application):
 
 
 if __name__ == '__main__':
-    app = DamBreak3D()
+    app = MilkCrown()
     app.run()
     app.post_process(app.info_filename)

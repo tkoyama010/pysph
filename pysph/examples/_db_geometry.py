@@ -247,7 +247,7 @@ class DamBreak2DGeometry(object):
         return particles
 
 
-class DamBreak3DGeometry(object):
+class MilkCrownGeometry(object):
     def __init__(
         self,
         container_height=1.0,
